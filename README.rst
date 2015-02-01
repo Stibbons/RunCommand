@@ -8,6 +8,7 @@ arbitrary commands. Can also help with plugin development.
 
 Command palette
 ===============
+
 3 new commands are available:
 
 - Run Application Command
