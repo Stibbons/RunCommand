@@ -2,18 +2,29 @@ from __future__ import division
 
 import json
 import re
-
 import sublime
 
 from collections import namedtuple
 from functools import partial
 from inspect import getargspec
-from itertools import chain, izip
+from itertools import chain
 from operator import attrgetter
-from types import BuiltinMethodType, MethodType
+from types import BuiltinMethodType
+from types import MethodType
 
-from sublime_plugin import ApplicationCommand, TextCommand, WindowCommand, \
-    application_command_classes, text_command_classes, window_command_classes
+try:
+    # Python 2
+    from itertools import izip
+except ImportError:
+    # Python 3
+    izip = zip
+
+from sublime_plugin import application_command_classes
+from sublime_plugin import ApplicationCommand
+from sublime_plugin import text_command_classes
+from sublime_plugin import TextCommand
+from sublime_plugin import window_command_classes
+from sublime_plugin import WindowCommand
 
 
 CommandInfo = namedtuple('CommandInfo', 'name required_args optional_args doc '
@@ -75,6 +86,7 @@ def format_arguments(cmd):
 
 
 class RunCommand(object):
+
     def get_builtin_command_info(self, cmd):
         required_args = []
         optional_args = []
@@ -145,7 +157,7 @@ class RunCommand(object):
         cmd = commands[index]
         if has_any_args(cmd):
             self.get_window().show_input_panel(format_arguments(cmd) + ':', '',
-                    partial(self.handle_complex_command, cmd), None, None)
+                                               partial(self.handle_complex_command, cmd), None, None)
         else:
             self.run_command(cmd.name)
 
@@ -163,7 +175,7 @@ class RunCommand(object):
                                 positional_args):
             if name in named_args:
                 raise ValueError('Repeated value for argument "{0}"'.format(
-                        name))
+                    name))
             named_args[name] = value
 
         try:
@@ -196,8 +208,8 @@ class RunCommand(object):
         # Sort command names and display to the user.
         commands.sort(key=attrgetter('name'))
         self.get_window().show_quick_panel(
-                [self.get_command_desc(cmd) for cmd in commands],
-                partial(self.handle_command, commands))
+            [self.get_command_desc(cmd) for cmd in commands],
+            partial(self.handle_command, commands))
 
 
 class RunTextCommandCommand(RunCommand, TextCommand):
